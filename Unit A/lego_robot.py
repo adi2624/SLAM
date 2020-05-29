@@ -40,6 +40,7 @@ class LegoLogfile(object):
         first_filtered_positions = True
         first_landmarks = True
         first_detected_cylinders = True
+        print(filename)
         f = open(filename)
         for l in f:
             sp = l.split()

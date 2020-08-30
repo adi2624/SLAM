@@ -29,7 +29,40 @@ def find_cylinders(scan, scan_derivative, jump, min_dist):
 
     # --->>> Insert here your previous solution from find_cylinders_question.py.
 
+    for i in range(len(scan_derivative)):
+        # --->>> Insert your cylinder code here.
+        # Whenever you find a cylinder, add a tuple
+        # (average_ray, average_depth) to the cylinder_list.
+        
+        if abs(scan_derivative[i]) > jump:
+
+            if on_cylinder:
+                if on_cylinder and scan_derivative[i] < 0:
+                    sum_ray, sum_depth, rays = 0.0, 0.0, 0
+                else:
+                    on_cylinder = False
+                    avg_ray = sum_ray/rays
+                    avg_depth = sum_depth/rays
+                    cylinder_list.append((avg_ray,avg_depth))
+                    sum_ray, sum_depth, rays = 0.0, 0.0, 0
+            if not on_cylinder and scan_derivative[i] < 0:
+                on_cylinder = True
+        if scan[i]<= min_dist:
+            sum_ray, sum_depth, rays = 0.0, 0.0, 0
+        if on_cylinder and scan[i] > min_dist:
+            rays += 1
+            sum_ray += i
+            sum_depth += scan[i]
+
+
+        # Just for fun, I'll output some cylinders.
+        # Replace this by your code.
+        """
+        if i % 100 == 0:
+            cylinder_list.append( (i, scan[i]) )
+        """
     return cylinder_list
+
 
 def compute_cartesian_coordinates(cylinders, cylinder_offset):
     result = []
@@ -38,7 +71,12 @@ def compute_cartesian_coordinates(cylinders, cylinder_offset):
         # c is a tuple (beam_index, range).
         # For converting the beam index to an angle, use
         # LegoLogfile.beam_index_to_angle(beam_index)
-        result.append( (0,0) ) # Replace this by your (x,y)
+        ray, depth = c
+        depth += 90    # Add 90mm to the range
+        converted_angle = LegoLogfile.beam_index_to_angle(ray)
+        x_coord = depth*cos(converted_angle)
+        y_coord = depth*sin(converted_angle)
+        result.append( (x_coord,y_coord) ) # Replace this by your (x,y)
     return result
         
 

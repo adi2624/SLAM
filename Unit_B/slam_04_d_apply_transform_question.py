@@ -16,10 +16,28 @@ from math import sqrt, atan2
 # the index pair (i, j), where i is the index of the cylinder, and
 # j is the index of the reference_cylinder, to the result list.
 # This is the function developed in slam_04_b_find_cylinder_pairs.
+
+def compute_distance(p1,p2):
+
+    x1,y1 = p1
+    x2,y2 = p2
+    return sqrt((x2-x1)**2 + (y2-y1)**2)
+
 def find_cylinder_pairs(cylinders, reference_cylinders, max_radius):
     cylinder_pairs = []
+    for i,cylinder in enumerate(cylinders):
+        min_distance = float("inf")
+        min_index = None
+        for j,ref_cylinder in enumerate(reference_cylinders):
+            dist = compute_distance(cylinder,ref_cylinder)
+            if dist < min_distance:
+                min_distance = dist
+                min_index = j
+        if min_distance < max_radius:
+            cylinder_pairs.append((i,min_index))
 
-    # --->>> Insert your previous solution here.
+    # --->>> Insert here your code from the last question,
+    # slam_04_b_find_cylinder_pairs.
 
     return cylinder_pairs
 
@@ -41,11 +59,48 @@ def compute_center(point_list):
 # i.e., the rotation angle is not given in radians, but rather in terms
 # of the cosine and sine.
 def estimate_transform(left_list, right_list, fix_scale = False):
-    # Compute left and right center.
+# Compute left and right center.
     lc = compute_center(left_list)
     rc = compute_center(right_list)
+    for i in range(len(left_list)):
+        left_list[i] = (left_list[i][0] - lc[0],left_list[i][1] - lc[1])
+        right_list[i] = (right_list[i][0] - rc[0], right_list[i][1] - rc[1])
+    left_centered = left_list
+    right_centered = right_list
+    cs = 0.0
+    ss = 0.0
+    rr = 0.0
+    ll = 0.0
+    m = len(left_list)
+    for i in range(m):
+        cs += (right_centered[i][0]*left_centered[i][0]) + (right_centered[i][1]*left_centered[i][1])
+        ss += (-right_centered[i][0]*left_centered[i][1]) + (right_centered[i][1]*left_centered[i][0])
+        rr += (right_centered[i][0]*right_centered[i][0]) + (right_centered[i][1]*right_centered[i][1])
+        ll += (left_centered[i][0]*left_centered[i][0]) + (left_centered[i][1]*left_centered[i][1])
 
-    # --->>> Insert your previous solution here.
+    if ll == 0.0 or rr == 0.0:
+        return None
+    if fix_scale:
+        la = 1
+    else:
+        la = sqrt(rr/ll)
+    
+    if cs == 0.0 or ss == 0.0:
+        return None
+    else:
+        c = cs/sqrt((cs*cs) + (ss*ss))
+        s = ss/sqrt((cs*cs) + (ss*ss))
+
+    rx = rc[0]
+    ry = rc[1]
+
+    lx = lc[0]
+    ly = lc[1]
+
+    tx = rx - (la)*(c*lx - s*ly)
+    ty = ry - (la)*(s*lx + c*ly)
+
+    # --->>> Insert here your code to compute lambda, c, s and tx, ty.
 
     return la, c, s, tx, ty
 
@@ -66,6 +121,12 @@ def apply_transform(trafo, p):
 def correct_pose(pose, trafo):
     
     # --->>> This is what you'll have to implement.
+    x,y,theta = pose
+    nx,ny = apply_transform(trafo,tuple((x,y)))
+    c,s = trafo[1], trafo[2]
+    alpha = atan2(s,c)
+    ntheta = theta + alpha
+    pose = [nx,ny,ntheta]
 
     return (pose[0], pose[1], pose[2])  # Replace this by the corrected pose.
 

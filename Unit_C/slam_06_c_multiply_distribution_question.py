@@ -6,10 +6,17 @@ from distribution import *
 
 def multiply(a, b):
     """Multiply two distributions and return the resulting distribution."""
-
     # --->>> Put your code here.
-    
-    return a  # Modify this to return your result.
+    start = max(a.start(),b.start())
+    end = min(a.stop(),b.stop())
+    values = [0.0 for _ in range(start,end)]
+    norm_sum = 0.0
+    for i in range(start,end):
+         print(i)
+         values[i - start] = a.values[i - a.offset]*b.values[i - b.offset]
+         norm_sum += a.values[i - a.offset]*b.values[i - b.offset]
+    values = [values[i]/norm_sum for i in range(len(values))]
+    return Distribution(start,values)  # Modify this to return your result.
 
 
 if __name__ == '__main__':

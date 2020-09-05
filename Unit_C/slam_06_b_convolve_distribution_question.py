@@ -13,6 +13,17 @@ def convolve(a, b):
     """Convolve distribution a and b and return the resulting new distribution."""
 
     # --->>> Put your code here.
+
+    start = a.offset + b.offset
+    stop = (a.offset + len(a.values) - 1) + (b.offset + len(b.values) - 1)
+    values = [0.0 for _ in range(start,stop + 1)]
+
+    for i in range(len(a.values)):
+        for j in range(len(b.values)):
+            new_val = a.values[i]*b.values[j]
+            values[i+j] += new_val
+
+    a = Distribution(offset = start, values = values)
     
     return a  # Replace this by your own result.
 

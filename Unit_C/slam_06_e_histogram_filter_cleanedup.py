@@ -40,7 +40,7 @@ def histogram_filter_step(belief, control, measurement):
 #
 if __name__ == '__main__':
     arena = (0,200)
-    Dist = Distribution.triangle  # Distribution.triangle or Distribution.gaussian.
+    Dist = Distribution.gaussian  # Distribution.triangle or Distribution.gaussian.
 
     # Start position. Well known, so the distribution is narrow.
     position = Dist(10, 1)
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     measurements = [ Dist(60, 10), Dist(140, 20) ]
 
     # This is the filter loop.
-    for i in xrange(len(controls)):
+    for i in range(len(controls)):
         # Call the filter step. The corrected distribution becomes the new position.
         (prediction, position) = histogram_filter_step(position, controls[i], measurements[i])
         histogram_plot(prediction, measurements[i], position)

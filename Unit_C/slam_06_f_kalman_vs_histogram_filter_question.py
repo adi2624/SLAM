@@ -55,11 +55,17 @@ def kalman_filter_step(belief, control, measurement):
 
     # --->>> Put your code here.
     
+    
     # Prediction.
-    prediction = Density(belief.mu + 10.0, belief.sigma2 + 100.0)  # Replace
+    prediction = Density(belief.mu + control.mu, belief.sigma2 + control.sigma2)  # Replace
+
 
     # Correction.
-    correction = prediction  # Replace
+
+    k = prediction.sigma2/(prediction.sigma2 + measurement.sigma2)
+    mu = prediction.mu + k*(measurement.mu - prediction.mu)
+    variance = (1 - k)*prediction.sigma2
+    correction = Density(mu, variance)  # Replace
 
     return (prediction, correction)
 
@@ -81,7 +87,7 @@ if __name__ == '__main__':
     measurements_ = [ Density(60, 10**2), Density(140, 20**2) ]  # Kalman
 
     # This is the filter loop.
-    for i in xrange(len(controls)):
+    for i in range(len(controls)):
         # Histogram
         (prediction, position) = histogram_filter_step(position, controls[i], measurements[i])
         histogram_plot(prediction, measurements[i], position)

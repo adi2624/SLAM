@@ -15,6 +15,37 @@ def move(distribution, delta):
 
 # --->>> Copy your convolve(a, b) and multiply(a, b) functions here.
 
+def multiply(a, b):
+    """Multiply two distributions and return the resulting distribution."""
+    # --->>> Put your code here.
+    start = max(a.start(),b.start())
+    end = min(a.stop(),b.stop())
+    values = [0.0 for _ in range(start,end)]
+    norm_sum = 0.0
+    for i in range(start,end):
+         print(i)
+         values[i - start] = a.values[i - a.offset]*b.values[i - b.offset]
+         norm_sum += a.values[i - a.offset]*b.values[i - b.offset]
+    values = [values[i]/norm_sum for i in range(len(values))]
+    return Distribution(start,values)  # Modify this to return your result.
+
+def convolve(a, b):
+    """Convolve distribution a and b and return the resulting new distribution."""
+
+    # --->>> Put your code here.
+
+    start = a.offset + b.offset
+    stop = (a.offset + len(a.values) - 1) + (b.offset + len(b.values) - 1)
+    values = [0.0 for _ in range(start,stop + 1)]
+
+    for i in range(len(a.values)):
+        for j in range(len(b.values)):
+            new_val = a.values[i]*b.values[j]
+            values[i+j] += new_val
+
+    a = Distribution(offset = start, values = values)
+    
+    return a  # Replace this by your own result.
 
 
 if __name__ == '__main__':
@@ -39,9 +70,9 @@ if __name__ == '__main__':
         measurements.append(p)
 
     # This is the filter loop.
-    for i in xrange(len(controls)):
+    for i in range(len(controls)):
         # Move, by convolution. Also termed "prediction".
-        control = Distribution.triangle(controls[i], 10)
+        control = Distribution.triangle(controls[i], 50)
         position = convolve(position, control)
         plot(position.plotlists(*arena)[0], position.plotlists(*arena)[1],
              color='b', linestyle='steps')
